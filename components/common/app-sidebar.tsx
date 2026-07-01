@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Images } from "lucide-react"
+import { Blocks } from "lucide-react"
 
 import {
   Sidebar,
@@ -26,17 +26,16 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              variant="default"
+            <SidebarMenuButton 
               render={<Link href="/" />}
               tooltip={appConfig.name}
-              className="bg-zinc-100"
+              size="lg"
+              className="cursor-default"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <Images className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+                <Blocks className="size-4 stroke-[2.25]" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid flex-1 text-left text-md leading-tight">
                 <span className="truncate font-semibold">{appConfig.name}</span>
               </div>
             </SidebarMenuButton>
@@ -58,6 +57,7 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={item.label}
                       size="default"
+                      className={cn("hover:bg-zinc-100 transition-all duration-300")}
                     >
                       <Icon
                         aria-hidden
