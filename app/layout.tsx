@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { AppBottomNavbar } from "@/components/common/app-bottom-navbar";
 import { AppSidebar } from "@/components/common/app-sidebar";
@@ -11,11 +11,10 @@ import {
 import { appConfig } from "@/config/app";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
 });
 
 const geistMono = Geist_Mono({
@@ -36,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full", "antialiased", notoSansKr.variable, geistMono.variable, "font-sans")}
     >
       <body className="flex min-h-full flex-col pb-14 md:pb-0">
         {/* 사이드바 전체를 감싸는 최상위 컨텍스트 프로바이더 - 사이드바의 열림/닫힘 상태를 관리 및 하위 컴포넌트에 전달 */}
