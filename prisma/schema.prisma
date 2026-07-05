@@ -5,9 +5,111 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     Json
+  contentText String   @db.Text @map("content_text")
+
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @map("category_id")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tags        Tag[]
+  images      Image[]
+
+  @@index([categoryId])
+  @@map("posts")
+}
+
+model Category {
+  id    String @id @default(cuid())
+  label String @unique
+
+  posts Post[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique
+
+  posts Post[]
+
+  @@index([name])
+  @@map("tags")
+}
+
+model Image {
+  id           String   @id @default(cuid())
+  url          String   @db.Text
+  filename     String
+  originalName String?  @map("original_name")
+  mimeType     String   @map("mime_type")
+  size         Int
+  width        Int?
+  height       Int?
+  alt          String?  @db.Text
+  order        Int      @default(0)
+
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId       String   @map("post_id")
+
+  @@index([postId])
+  @@map("images")
+}
+
+model Photo {
+  id        String  @id @default(cuid())
+  filename  String
+  url       String
+  width     Int?
+  height    Int?
+  size      Int?
+  mimeType  String  @map("mime_type")
+  caption   String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  galleries GalleryPhoto[]
+
+  @@map("photos")
+}
+
+model Gallery {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  thumbnailId String? @map("thumbnail_id")
+
+  photos GalleryPhoto[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("galleries")
+}
+
+model GalleryPhoto {
+  galleryId String @map("gallery_id")
+  photoId   String @map("photo_id")
+
+  sortOrder Int    @default(0) @map("sort_order")
+
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  photo   Photo   @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@id([galleryId, photoId])
+  @@index([photoId])
+  @@map("gallery_photos")
 }
