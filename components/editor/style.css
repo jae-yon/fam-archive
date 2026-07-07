@@ -36,8 +36,8 @@
 /* ===== ProseMirror (editable area) ===== */
 .ProseMirror {
   outline: none;
-  padding: 12px 24px;
-  font-family: 'Pretendard', ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  padding: 0px 8px;
+  font-family: 'Noto Sans KR', ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.75;
@@ -60,9 +60,9 @@
 /* ===== Paragraph & spacing ===== */
 .ProseMirror p {
   margin: 1px 0;
-  padding: 3px 2px;
+  padding: 2px 4px;
   min-height: 1.75em;
-  border-radius: 3px;
+  border-radius: 8px;
   transition: background 0.1s;
 }
 
