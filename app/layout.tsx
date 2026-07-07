@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_KR } from "next/font/google";
+
 import "./globals.css";
+import ReactQueryProvider from "./providers";
+
 import { AppBottomNavbar } from "@/components/common/app-bottom-navbar";
 import { AppSidebar } from "@/components/common/app-sidebar";
+
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { appConfig } from "@/config/app";
+
 import { cn } from "@/lib/utils";
+import { appConfig } from "@/config/app";
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -38,21 +43,24 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", notoSansKr.variable, geistMono.variable, "font-sans")}
     >
       <body className="flex min-h-full flex-col pb-14 md:pb-0">
-        {/* 사이드바 전체를 감싸는 최상위 컨텍스트 프로바이더 - 사이드바의 열림/닫힘 상태를 관리 및 하위 컴포넌트에 전달 */}
-        <SidebarProvider>
-          {/* 사이드바 컴포넌트 - 사이드바의 내용을 표시 */}
-          <AppSidebar />
-          {/* 사이드바 우측에 메인 콘텐츠 영역을 감싸는 컨테이너 */}
-          <SidebarInset>
-            <header className="hidden h-14 shrink-0 items-center gap-2 border-b px-4 md:flex">
-              {/* 사이드바 열림/닫힘 버튼 */}
-              <SidebarTrigger />
-            </header>
-            {children}
-          </SidebarInset>
-        </SidebarProvider>
-        {/* 모바일 하단 네비게이션 바 */}
-        <AppBottomNavbar />
+        {/* React Query 프로바이더 */}
+        <ReactQueryProvider>
+          {/* 사이드바 전체를 감싸는 최상위 컨텍스트 프로바이더 - 사이드바의 열림/닫힘 상태를 관리 및 하위 컴포넌트에 전달 */}
+          <SidebarProvider>
+            {/* 사이드바 컴포넌트 - 사이드바의 내용을 표시 */}
+            <AppSidebar />
+            {/* 사이드바 우측에 메인 콘텐츠 영역을 감싸는 컨테이너 */}
+            <SidebarInset>
+              <header className="hidden h-14 shrink-0 items-center gap-2 border-b px-4 md:flex">
+                {/* 사이드바 열림/닫힘 버튼 */}
+                <SidebarTrigger />
+              </header>
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+          {/* 모바일 하단 네비게이션 바 */}
+          <AppBottomNavbar />
+        </ReactQueryProvider>
       </body>
     </html>
   );
