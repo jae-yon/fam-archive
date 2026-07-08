@@ -1,6 +1,6 @@
 "use client";
 
-import { PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
+import { AlertCircleIcon, AlertTriangleIcon, PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { 
@@ -18,13 +18,24 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Editor } from "@/components/editor/editor";
 import { Viewer } from "@/components/editor/viewer";
 import { Separator } from "@/components/ui/separator";
 import { DatePickerInput } from "@/components/common/date-picker";
 import { Category, Post } from "@/types/post";
 
-import { useCategories, useCreatePost, useUpdatePost } from "@/hooks/use-posts";
+import { useCategories, useCreatePost, useDeletePost, useUpdatePost } from "@/hooks/use-posts";
 import { formatDate } from "@/lib/date";
 
 interface PostSheetProps {
@@ -168,7 +179,6 @@ function PostForm({ open, data, onOpenChange }: { open: boolean; data?: Post; on
       <SheetFooter>
         <Button variant="default" className="w-full text-sm font-normal tracking-widest" onClick={handleSubmit}>
           <SaveIcon className="w-4 h-4" />
-          저장
         </Button>
       </SheetFooter>
     </SheetContent>
@@ -177,6 +187,16 @@ function PostForm({ open, data, onOpenChange }: { open: boolean; data?: Post; on
 
 function PostView({ open, data, onOpenChange, onModeChange }: { open: boolean; data?: Post; onOpenChange: (open: boolean) => void; onModeChange: (mode: "edit" | "view") => void }) {
   if (!data) return null;
+
+  const { mutate: deletePost } = useDeletePost();
+
+  const handleConfirmDelete = () => {
+    deletePost(data.id, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+    });
+  };
 
   return (
     <SheetContent side="right" className="flex flex-col gap-0 p-0 overflow-hidden h-full min-h-0 min-w-screen lg:min-w-[75vw] border border-r">
@@ -207,9 +227,31 @@ function PostView({ open, data, onOpenChange, onModeChange }: { open: boolean; d
         <Button variant="secondary" className="text-sm font-normal tracking-widest" onClick={() => onModeChange("edit")}>
           <PencilIcon className="w-4 h-4" />
         </Button>
-        <Button variant="destructive" className="text-sm font-normal tracking-widest">
-          <TrashIcon className="w-4 h-4" />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button variant="destructive" className="text-sm font-normal tracking-widest" />
+            }
+          >
+            <TrashIcon className="w-4 h-4" />
+          </AlertDialogTrigger>
+          <AlertDialogContent className="shadow-sm" size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="bg-red-500/10 p-2.5 rounded-full">
+                <TrashIcon className="w-6 h-6 text-red-500" />
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm font-normal mt-2">
+                <span className="font-medium">"{data.title}"</span> 게시글을 영구적으로 삭제합니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>취소</AlertDialogCancel>
+              <AlertDialogAction variant="destructive" onClick={handleConfirmDelete}>
+                삭제
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetFooter>
     </SheetContent>
   );

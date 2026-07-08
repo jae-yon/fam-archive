@@ -108,3 +108,17 @@ export async function updatePost(post: SavePostInput & { id: string }) {
   });
   return updatedPost;
 }
+
+export async function deletePost(id: string) {
+  const deletedPost = await prisma.post.delete({
+    where: {
+      id: id
+    },
+    include: {
+      category: true,
+      tags: true,
+      images: true,
+    },
+  });
+  return deletedPost;
+}

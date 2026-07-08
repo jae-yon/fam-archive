@@ -8,10 +8,11 @@ import {
 
 import { 
   createPost, 
+  deletePost, 
+  updatePost, 
   getCategories, 
   getPost, 
   getPosts, 
-  updatePost 
 } from "@/app/actions";
 
 import type { Post, PostContent, SavePostInput } from "@/types/post";
@@ -70,6 +71,19 @@ export function useUpdatePost() {
       if (!post.id) throw new Error("Post id is required for update");
       return updatePost({ ...toSavePostInput(post), id: post.id });
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deletePost(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
