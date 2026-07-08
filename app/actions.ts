@@ -1,0 +1,110 @@
+"use server";
+
+import { prisma } from '@/lib/prisma';
+import { Post } from '@/types/post';
+
+interface GetPostsOptions {
+  // 한 페이지에 보여지는 게시글 수
+  limit?: number;
+  // 페이지 번호
+  page?: number;
+  // 검색어
+  search?: string;
+  // 카테고리 ID
+  categoryId?: string;
+  // 정렬 기준
+  sort?: "createdAt" | "title"
+  // 정렬 방향
+  order?: "asc" | "desc";
+}
+
+// 전체 게시글 조회
+export async function getPosts(options: GetPostsOptions) {
+  const posts = await prisma.post.findMany({
+    take: options.limit ?? 10,
+    skip: (options.page ?? 1 - 1) * (options.limit ?? 10),
+    where: {
+      title: {
+        contains: options.search ?? "",
+      },
+      categoryId: options.categoryId ?? undefined,
+    },
+    orderBy: {
+      [options.sort ?? "createdAt"]: options.order ?? "desc",
+    },
+    include: {
+      category: true,
+      tags: true,
+      images: true,
+    },
+  });
+  return posts;
+}
+
+// 전체 카테고리 조회
+export async function getCategories() {
+  const categories = await prisma.category.findMany();
+  return categories;
+}
+
+// 게시글 상세 조회
+export async function getPost(id: string) {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: id
+    }
+  });
+  return post;
+}
+
+export async function createPost(post: Post) {
+  const newPost = await prisma.post.create({
+    data: {
+      title: post.title,
+      content: post.content,
+      contentText: post.contentText,
+      createdAt: post.createdAt,
+      categoryId: post.categoryId,
+      tags: {
+        connect: post.tags.map((tag) => ({ id: tag.id })),
+      },
+      images: {
+        connect: post.images.map((image) => ({ id: image.id })),
+      },
+    },
+    include: {
+      category: true,
+      tags: true,
+      images: true,
+    },
+  });
+  
+  return newPost;
+}
+
+export async function updatePost(post: Post) {
+  const updatedPost = await prisma.post.update({
+    where: {
+      id: post.id
+    },
+    data: {
+      title: post.title,
+      content: post.content,
+      contentText: post.contentText,
+      createdAt: post.createdAt,
+      categoryId: post.categoryId,
+      tags: {
+        set: post.tags.map((tag) => ({ id: tag.id })),
+      },
+      images: {
+        set: post.images.map((image) => ({ id: image.id })),
+      },
+    },
+    include: {
+      category: true,
+      tags: true,
+      images: true,
+    },
+  });
+  return updatedPost;
+}
