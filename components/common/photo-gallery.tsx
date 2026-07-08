@@ -66,6 +66,7 @@ function renderNextImage(
         title={title}
         sizes={sizes}
         className="object-cover"
+        priority
       />
       <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent px-4 py-3 text-left text-sm font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         {formatDate(photo.source.createdAt)}

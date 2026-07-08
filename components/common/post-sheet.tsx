@@ -121,7 +121,7 @@ function PostForm({ open, data, onOpenChange }: { open: boolean; data?: Post; on
             type="text" 
             placeholder="제목을 입력해주세요."
             value={post.title}
-            className="text-xl lg:text-2xl font-semibold tracking-tight w-1/2 border-none outline-none focus:ring-0 focus:ring-offset-0"
+            className="text-xl lg:text-2xl font-semibold tracking-tight w-2/3 border-none outline-none focus:ring-0 focus:ring-offset-0"
             onChange={(e) => setPost({ ...post, title: e.target.value })}
           />
         </SheetTitle>
@@ -189,11 +189,11 @@ function PostView({ open, data, onOpenChange, onModeChange }: { open: boolean; d
       <Separator className="mb-2" />
       
       <div className="flex items-center gap-2 px-2">
-        <span className="rounded-full bg-zinc-100 px-4 py-2 text-xs font-normal tracking-wider cursor-default">
-          {data.category.label}
-        </span>
-        <span className="rounded-full bg-zinc-100 px-4 py-2 text-xs font-normal tracking-wider cursor-default">
+        <span className="rounded-full bg-zinc-100 text-zinc-600 px-4 py-2 text-xs font-medium tracking-wider cursor-default">
           {formatDate(data.createdAt)}
+        </span>
+        <span className="rounded-full bg-zinc-100 text-zinc-600 px-4 py-2 text-xs font-medium tracking-wider cursor-default">
+          {data.category.label}
         </span>
       </div>
 
