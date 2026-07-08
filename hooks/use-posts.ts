@@ -14,7 +14,20 @@ import {
   updatePost 
 } from "@/app/actions";
 
-import { Post } from "@/types/post";
+import type { Post, PostContent, SavePostInput } from "@/types/post";
+
+function toSavePostInput(post: Post): SavePostInput {
+  return {
+    id: post.id || undefined,
+    title: post.title,
+    content: JSON.parse(JSON.stringify(post.content)) as PostContent,
+    contentText: post.contentText,
+    createdAt: post.createdAt,
+    categoryId: post.categoryId,
+    tagIds: post.tags.map((tag) => tag.id),
+    imageIds: post.images.map((image) => image.id),
+  };
+}
 
 export function useRecentPosts() {
   return useQuery({
@@ -40,7 +53,7 @@ export function useCategories() {
 export function useCreatePost() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (post: Post) => createPost(post),
+    mutationFn: (post: Post) => createPost(toSavePostInput(post)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
@@ -53,7 +66,10 @@ export function useCreatePost() {
 export function useUpdatePost() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (post: Post) => updatePost(post),
+    mutationFn: (post: Post) => {
+      if (!post.id) throw new Error("Post id is required for update");
+      return updatePost({ ...toSavePostInput(post), id: post.id });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
