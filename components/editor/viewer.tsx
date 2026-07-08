@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';

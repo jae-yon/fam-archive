@@ -1,3 +1,5 @@
+"use client";
+
 import { PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 

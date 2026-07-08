@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
@@ -25,7 +27,8 @@ export function Editor({ content, onUpdate, className }: EditorProps) {
     onUpdate: ({ editor }) => {
       if (onUpdate) {
         try {
-          const json = editor.getJSON();
+          // codeBlock 등 일부 노드가 DOM 참조를 포함할 수 있어 Server Action 전달 전 직렬화
+          const json = JSON.parse(JSON.stringify(editor.getJSON()));
           const text = editor.getText();
           onUpdate(json, text);
         } catch (error) {
