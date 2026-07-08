@@ -55,7 +55,7 @@ export function Board() {
           {recentPosts.map((post) => (
             <Card 
               key={post.id} 
-              className="shadow-none border border-zinc-50 bg-none hover:border-zinc-200 hover:shadow-xs hover:bg-zinc-50 transition-all duration-300 cursor-default"
+              className="shadow-none border border-zinc-50 bg-none hover:border-zinc-200 hover:shadow-xs hover:bg-zinc-50 transition-all duration-300 cursor-default rounded-2xl"
               onClick={() => handleView(post.id)}
             >
               <CardHeader>
