@@ -40,9 +40,9 @@ export function AppBottomNavbar() {
                 /> */}
                 <Icon
                   aria-hidden
-                  className={cn("size-5 shrink-0 stroke-2", isActive && "stroke-[2.25]")}
+                  className={cn("size-5 shrink-0 stroke-2")}
                 />
-                <span className={cn(isActive && "font-semibold")}>
+                <span>
                   {item.label}
                 </span>
               </Link>
