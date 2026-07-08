@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from '@/lib/prisma';
-import { Post } from '@/types/post';
+import type { SavePostInput } from '@/types/post';
 
 interface GetPostsOptions {
   // 한 페이지에 보여지는 게시글 수
@@ -57,19 +57,19 @@ export async function getPost(id: string) {
   return post;
 }
 
-export async function createPost(post: Post) {
+export async function createPost(post: SavePostInput) {
   const newPost = await prisma.post.create({
     data: {
       title: post.title,
-      content: post.content,
+      content: post.content as object,
       contentText: post.contentText,
       createdAt: post.createdAt,
       categoryId: post.categoryId,
       tags: {
-        connect: post.tags.map((tag) => ({ id: tag.id })),
+        connect: post.tagIds.map((id) => ({ id })),
       },
       images: {
-        connect: post.images.map((image) => ({ id: image.id })),
+        connect: post.imageIds.map((id) => ({ id })),
       },
     },
     include: {
@@ -82,22 +82,22 @@ export async function createPost(post: Post) {
   return newPost;
 }
 
-export async function updatePost(post: Post) {
+export async function updatePost(post: SavePostInput & { id: string }) {
   const updatedPost = await prisma.post.update({
     where: {
       id: post.id
     },
     data: {
       title: post.title,
-      content: post.content,
+      content: post.content as object,
       contentText: post.contentText,
       createdAt: post.createdAt,
       categoryId: post.categoryId,
       tags: {
-        set: post.tags.map((tag) => ({ id: tag.id })),
+        set: post.tagIds.map((id) => ({ id })),
       },
       images: {
-        set: post.images.map((image) => ({ id: image.id })),
+        set: post.imageIds.map((id) => ({ id })),
       },
     },
     include: {
