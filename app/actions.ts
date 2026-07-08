@@ -47,6 +47,16 @@ export async function getCategories() {
   return categories;
 }
 
+// 전체 갤러리 조회
+export async function getGalleries() {
+  const galleries = await prisma.gallery.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return galleries;
+}
+
 // 게시글 상세 조회
 export async function getPost(id: string) {
   const post = await prisma.post.findUnique({
