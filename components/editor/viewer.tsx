@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
+import StarterKit from '@tiptap/starter-kit';
+import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 
 import './style.css';
 
