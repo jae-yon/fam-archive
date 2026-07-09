@@ -1,6 +1,6 @@
 import type { Photo as AlbumPhoto } from 'react-photo-album';
 
-import type { Photo } from '@/types/photo';
+import type { Photo } from '@/types/gallery';
 
 /**
  * 사진 앨범 포토
