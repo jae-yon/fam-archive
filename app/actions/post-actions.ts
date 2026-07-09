@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from '@/lib/prisma';
-import type { SavePostInput } from '@/types/post';
+import { prisma } from "@/lib/prisma";
+import type { SavePostInput } from "@/types/post";
 
 interface GetPostsOptions {
   // 한 페이지에 보여지는 게시글 수
@@ -13,12 +13,12 @@ interface GetPostsOptions {
   // 카테고리 ID
   categoryId?: string;
   // 정렬 기준
-  sort?: "createdAt" | "title"
+  sort?: "createdAt" | "title";
   // 정렬 방향
   order?: "asc" | "desc";
 }
 
-// 전체 게시글 조회
+// 게시글 목록 조회
 export async function getPosts(options: GetPostsOptions) {
   const posts = await prisma.post.findMany({
     take: options.limit ?? 10,
@@ -41,32 +41,17 @@ export async function getPosts(options: GetPostsOptions) {
   return posts;
 }
 
-// 전체 카테고리 조회
-export async function getCategories() {
-  const categories = await prisma.category.findMany();
-  return categories;
-}
-
-// 전체 갤러리 조회
-export async function getGalleries() {
-  const galleries = await prisma.gallery.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-  return galleries;
-}
-
 // 게시글 상세 조회
 export async function getPost(id: string) {
   const post = await prisma.post.findUnique({
     where: {
-      id: id
-    }
+      id: id,
+    },
   });
   return post;
 }
 
+// 게시글 생성
 export async function createPost(post: SavePostInput) {
   const newPost = await prisma.post.create({
     data: {
@@ -88,14 +73,15 @@ export async function createPost(post: SavePostInput) {
       images: true,
     },
   });
-  
+
   return newPost;
 }
 
+// 게시글 수정
 export async function updatePost(post: SavePostInput & { id: string }) {
   const updatedPost = await prisma.post.update({
     where: {
-      id: post.id
+      id: post.id,
     },
     data: {
       title: post.title,
@@ -119,10 +105,11 @@ export async function updatePost(post: SavePostInput & { id: string }) {
   return updatedPost;
 }
 
+// 게시글 삭제
 export async function deletePost(id: string) {
   const deletedPost = await prisma.post.delete({
     where: {
-      id: id
+      id: id,
     },
     include: {
       category: true,
@@ -131,4 +118,10 @@ export async function deletePost(id: string) {
     },
   });
   return deletedPost;
+}
+
+// 게시글 카테고리 조회
+export async function getCategories() {
+  const categories = await prisma.category.findMany();
+  return categories;
 }

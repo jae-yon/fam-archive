@@ -13,7 +13,7 @@ import {
   getCategories, 
   getPost, 
   getPosts, 
-} from "@/app/actions";
+} from "@/app/actions/post-actions";
 
 import type { Post, PostContent, SavePostInput } from "@/types/post";
 
