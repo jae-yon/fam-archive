@@ -19,7 +19,7 @@ import 'yet-another-react-lightbox/styles.css';
 import { toAlbumPhotos, type GalleryAlbumPhoto } from '@/lib/photo-album';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/date';
-import type { Photo } from '@/types/photo';
+import type { Photo } from '@/types/gallery';
 
 /**
  * 기본 크기 설정
