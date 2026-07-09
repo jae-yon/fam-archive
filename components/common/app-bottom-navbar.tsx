@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { isNavItemActive, navItems } from "@/config/navigation"
+import { isNavItemActive, NAV_ITEMS } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 
 export function AppBottomNavbar() {
@@ -15,7 +15,7 @@ export function AppBottomNavbar() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-backdrop-filter:bg-background/80 md:hidden"
     >
       <ul className="flex items-stretch justify-around">
-        {navItems.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const isActive = isNavItemActive(pathname, item.href)
           const Icon = item.icon
 

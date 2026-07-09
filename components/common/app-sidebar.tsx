@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { appConfig } from "@/config/app"
-import { isNavItemActive, navItems } from "@/config/navigation"
+import { isNavItemActive, NAV_ITEMS } from "@/config/navigation"
 import { cn } from "@/lib/utils"
 
 export function AppSidebar() {
@@ -46,7 +46,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {NAV_ITEMS.map((item) => {
                 const isActive = isNavItemActive(pathname, item.href)
                 const Icon = item.icon
 
