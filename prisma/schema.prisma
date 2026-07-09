@@ -71,18 +71,19 @@ model Image {
 }
 
 model Photo {
-  id        String  @id @default(cuid())
-  filename  String
-  url       String
-  width     Int?
-  height    Int?
-  size      Int?
-  mimeType  String  @map("mime_type")
-  caption   String?
+  id           String  @id @default(cuid())
+  filename     String
+  originalName String? @map("original_name")
+  url          String
+  width        Int?
+  height       Int?
+  size         Int?
+  mimeType     String  @map("mime_type")
+  caption      String?
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  galleries GalleryPhoto[]
+  galleries    GalleryPhoto[]
 
   @@map("photos")
 }
