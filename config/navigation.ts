@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import { Book, Home, Image } from "lucide-react"
+import { NotebookText, Home, Image } from "lucide-react"
 
 export type NavItem = {
   href: string
@@ -9,8 +9,8 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "홈", icon: Home },
-  { href: "/board", label: "게시판", icon: Book },
-  { href: "/album", label: "앨범", icon: Image },
+  { href: "/board", label: "게시판", icon: NotebookText },
+  { href: "/gallery", label: "갤러리", icon: Image },
 ]
 
 export function isNavItemActive(pathname: string, href: string): boolean {
