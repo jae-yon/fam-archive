@@ -20,7 +20,7 @@ export function useRecentPhotos() {
   });
 }
 
-export function useUploadPhotosToGallery() {
+export function useUploadPhotos() {
   const queryClient = useQueryClient();
 
   return useMutation<UploadPhotosResponse, Error, UploadPhotosInput>({
@@ -34,6 +34,7 @@ export function useUploadPhotosToGallery() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["galleries"] });
+      await queryClient.invalidateQueries({ queryKey: ["photos"] });
     },
   });
 }
