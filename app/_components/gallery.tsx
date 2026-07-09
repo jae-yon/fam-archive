@@ -6,24 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PhotoGallery } from "@/components/common/photo-gallery";
 import { PhotoUploadDialog } from "@/components/common/photo-upload-dialog";
 import { useRecentPhotos } from '@/hooks/use-galleries';
-
-import type { Photo } from "@/types/gallery";
-
-/**
- * 최근 사진 목록 조회
- * @param photos - 사진 목록
- * @param limit - 최대 노출 사진 수
- * @returns 최근 사진 목록
- */
-function getRecentPhotos(photos: Photo[], limit = 12) {
-  return [...photos]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .slice(0, limit);
-}
-                                                                                                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                          
 export function Gallery() {
   const [uploadOpen, setUploadOpen] = useState(false);
 
