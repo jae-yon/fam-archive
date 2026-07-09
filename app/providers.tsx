@@ -1,7 +1,7 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 /**
  * React Query 클라이언트 프로바이더

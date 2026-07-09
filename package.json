@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 2000",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "next start -p 2000",
+    "lint": "eslint",
+    "prisma:push": "npx prisma db push",
+    "prisma:studio": "npx prisma studio",
+    "prisma:migrate": "npx prisma migrate deploy",
+    "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -36,6 +40,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "prisma": "^7.8.0",
