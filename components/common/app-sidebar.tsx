@@ -57,13 +57,10 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={item.label}
                       size="default"
-                      className={cn("hover:bg-zinc-100 transition-all duration-300")}
+                      className={cn(isActive ? "" : "bg-transparent hover:bg-zinc-100 transition-all duration-300")}
                     >
-                      <Icon
-                        aria-hidden
-                        className={cn(isActive && "stroke-[2.25]")}
-                      />
-                      <span className="truncate font-normal">{item.label}</span>
+                      <Icon aria-hidden />
+                      <span className="truncate font-medium text-zinc-800">{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
