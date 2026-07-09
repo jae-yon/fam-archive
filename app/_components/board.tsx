@@ -74,9 +74,9 @@ export function Board() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-2 items-center justify-center h-[300px]">
-          <FileX2 className="w-10 h-10 text-muted-foreground mx-auto" />
-          <p className="text-muted-foreground">게시글이 없습니다.</p>
+        <div className="flex flex-col items-center justify-center h-48 gap-2">
+          <FileX2 className="size-10 text-muted-foreground mx-auto" />
+          <p className="text-muted-foreground">게시글이 없습니다. 첫 번째 게시글을 작성해주세요.</p>
         </div>
       )}
 
