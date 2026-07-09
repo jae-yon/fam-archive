@@ -7,7 +7,7 @@ export type NavItem = {
   icon: LucideIcon
 }
 
-export const navItems: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "홈", icon: Home },
   { href: "/board", label: "게시판", icon: Book },
   { href: "/album", label: "앨범", icon: Image },
