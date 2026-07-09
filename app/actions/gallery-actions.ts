@@ -1,6 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { toPhotoView } from "@/lib/photo-mapper";
+import { getUploadRootPath } from "@/lib/upload-path";
 import { UploadPhotosResponse } from '@/types/gallery';
 import { imageSize } from "image-size";
 
@@ -15,18 +17,6 @@ export async function getGalleries() {
     },
   });
   return galleries;
-}
-
-// 이미지 업로드 경로 반환
-function getUploadRootPath() {
-  const uploadPath = process.env.UPLOAD_PATH;
-
-  if (!uploadPath) {
-    throw new Error("업로드 환경변수를 찾을 수 없습니다.");
-  }
-
-  // 절대경로로 정규화
-  return path.resolve(uploadPath);
 }
 
 // 안전한 경로 세그먼트 생성
@@ -163,5 +153,6 @@ export async function getPhotos(options: GetPhotosOptions) {
     take: options.limit ?? 10,
     orderBy: { [options.sort ?? "createdAt"]: options.order ?? "desc" },
   });
-  return photos;
+
+  return photos.map(toPhotoView);
 }
