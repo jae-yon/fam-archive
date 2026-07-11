@@ -10,7 +10,12 @@
     "prisma:push": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
     "prisma:migrate": "npx prisma migrate deploy",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f app",
+    "docker:rebuild": "docker compose build --no-cache && docker compose up -d"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
