@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# dependencies (must not overwrite Linux packages from npm ci)
+node_modules
+
+# Next.js
+.next
+out
+
+# env files
+.env
+.env.*
+!.env.docker.example
+
+# uploads and local data
+uploads
+/dev/uploads
+
+# editor / OS
+.DS_Store
+*.pem
+.vscode
+.idea
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# test / coverage
+coverage
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# generated at build time
+app/generated/prisma
+
+# docker
+Dockerfile
+docker-compose.yml
+scripts

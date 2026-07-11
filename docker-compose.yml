@@ -1,0 +1,24 @@
+name: dongasoft
+
+services:
+  app:
+    # 이미지가 없으면 현재 디렉토리의 Dockerfile을 사용하여 빌드
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # 빌드된 이미지의 이름과 태그
+    image: fam_archive:latest
+    container_name: fam_archive
+    # 포트 매핑
+    ports:
+      - "${PORT:-2000}:2000"
+    # 환경 변수 파일
+    env_file:
+      - .env
+    environment:
+      - DATABASE_HOST=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "${DOCKER_UPLOAD_PATH:-./uploads}:/uploads"
+    restart: unless-stopped
