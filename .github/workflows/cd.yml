@@ -1,0 +1,87 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  # 도커 이미지 이름 - 레포지토리 이름
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  publish:
+    # CI 작업이 성공한 경우에만 실행
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    # 권한 설정
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      # GHCR에 로그인
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 메타데이터 추출
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=
+
+      # 빌드 및 푸시
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Verify push
+        run: |
+          set -euo pipefail
+
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          IMAGE="${IMAGE,,}"
+          DIGEST="${{ steps.push.outputs.digest }}"
+
+          echo "==> Pushed tags"
+          echo "${{ steps.meta.outputs.tags }}"
+          echo
+          echo "==> Image digest"
+          echo "${DIGEST}"
+          echo
+
+          if [ -z "${DIGEST}" ]; then
+            echo "::error::Push digest is empty. Image may not have been pushed."
+            exit 1
+          fi
+
+          echo "==> Inspecting image on GHCR"
+          docker buildx imagetools inspect "${IMAGE}@${DIGEST}"
+
+          echo
+          echo "==> Push verified successfully"
+          echo "Image: ${IMAGE}"
+          echo "Digest: ${DIGEST}"
+          echo "Tags:"
+          echo "${{ steps.meta.outputs.tags }}" | sed 's/^/  - /'

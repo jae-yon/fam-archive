@@ -1,4 +1,4 @@
-name: dongasoft
+name: ${DOCKER_NAME:-fam_archive}
 
 services:
   app:
