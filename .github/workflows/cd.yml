@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   # 도커 이미지 이름 - 레포지토리 이름
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: fam_archive
 
 jobs:
   publish:
@@ -59,6 +59,10 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,10 +79,6 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           source: docker-compose.yml
           target: ${{ secrets.DEPLOY_PATH }}
-
-      # 환경변수 파일 생성
-
-      # GHCR에서 이미지 다운로드 및 도커 컴포즈 실행
 
       - name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -116,3 +116,30 @@ jobs:
 
             EOF
             chmod 600 ${{ secrets.DEPLOY_PATH }}/.env
+
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+            docker compose pull
+
+            # Entrypoint runs `prisma migrate deploy` before starting the app
+            docker compose up -d --build
+
+            echo "🧹 Pruning unused Docker images..."
+            docker image prune -af --filter "until=24h" || true
+
+            echo "⏳ Waiting for migrate + app start..."
+            sleep 25
+
+            echo "🐳 Docker containers:"
+            docker compose ps
+
+            if ! docker compose ps --status running | grep -q fam_archive; then
+              echo "❌ Container is not running. Recent logs:"
+              docker compose logs --tail=100 app
+              exit 1
+            fi
+
+            echo "📜 Recent app logs (includes migrate output):"
+            docker compose logs --tail=50 app
+
+            echo "✅ Deployment completed successfully!"
