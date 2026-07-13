@@ -56,32 +56,23 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Verify push
-        run: |
-          set -euo pipefail
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
 
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
-          IMAGE="${IMAGE,,}"
-          DIGEST="${{ steps.push.outputs.digest }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
-          echo "==> Pushed tags"
-          echo "${{ steps.meta.outputs.tags }}"
-          echo
-          echo "==> Image digest"
-          echo "${DIGEST}"
-          echo
-
-          if [ -z "${DIGEST}" ]; then
-            echo "::error::Push digest is empty. Image may not have been pushed."
-            exit 1
-          fi
-
-          echo "==> Inspecting image on GHCR"
-          docker buildx imagetools inspect "${IMAGE}@${DIGEST}"
-
-          echo
-          echo "==> Push verified successfully"
-          echo "Image: ${IMAGE}"
-          echo "Digest: ${DIGEST}"
-          echo "Tags:"
-          echo "${{ steps.meta.outputs.tags }}" | sed 's/^/  - /'
+      - name: Copy Docker Compose File
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: docker-compose.yml
+          target: ${{ secrets.DEPLOY_PATH }}
