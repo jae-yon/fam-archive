@@ -75,3 +75,44 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           source: docker-compose.yml
           target: ${{ secrets.DEPLOY_PATH }}
+
+      # 환경변수 파일 생성
+
+      # GHCR에서 이미지 다운로드 및 도커 컴포즈 실행
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          script: |
+            echo "🚀 Deploying application..."
+
+            if [ ! -d ${{ secrets.UPLOADS_PATH }} ]; then
+              mkdir -p ${{ secrets.UPLOADS_PATH }} 
+            fi
+
+            cd ${{ secrets.DEPLOY_PATH }}
+
+            echo "📂 Current directory: $(pwd)"
+
+            echo "🔑 Creating .env file..." 
+
+            cat > ${{ secrets.DEPLOY_PATH }}/.env << EOF
+
+            DATABASE_PORT=${{ secrets.DATABASE_PORT }}
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+
+            UPLOADS_PATH="/uploads"
+            DOCKER_UPLOADS_PATH=${{ secrets.UPLOADS_PATH }}
+
+            EOF
+            chmod 600 ${{ secrets.DEPLOY_PATH }}/.env

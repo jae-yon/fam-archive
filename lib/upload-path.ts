@@ -5,7 +5,7 @@ import path from "node:path";
  * @returns 업로드 경로
  */
 export function getUploadRootPath() {
-  const uploadPath = process.env.UPLOAD_PATH;
+  const uploadPath = process.env.UPLOADS_PATH;
 
   if (!uploadPath) {
     throw new Error("업로드 경로가 설정되어 있지 않습니다.");

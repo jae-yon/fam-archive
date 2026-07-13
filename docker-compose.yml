@@ -17,5 +17,5 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - "${DOCKER_UPLOAD_PATH:-./uploads}:/uploads"
+      - "${DOCKER_UPLOADS_PATH:-./uploads}:/uploads"
     restart: unless-stopped
