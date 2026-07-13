@@ -8,8 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # 도커 이미지 이름 - 레포지토리 이름
-  IMAGE_NAME: fam_archive
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   publish:
