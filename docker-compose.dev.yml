@@ -1,6 +1,9 @@
 services:
   app:
-    image: ghcr.io/jae-yon/fam-archive:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_IMAGE:-fam_archive:latest}
     container_name: fam_archive
     # 포트 매핑
     ports:
