@@ -122,6 +122,7 @@ jobs:
             docker compose pull
 
             # Entrypoint runs `prisma migrate deploy` before starting the app
+            
             docker compose up -d --build
 
             echo "🧹 Pruning unused Docker images..."

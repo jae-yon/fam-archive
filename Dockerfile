@@ -74,3 +74,5 @@ USER nextjs
 EXPOSE 2000
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
+
+CMD ["node", "server.js"]

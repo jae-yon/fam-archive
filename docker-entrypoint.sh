@@ -12,12 +12,12 @@ if [ -z "$DATABASE_HOST" ] || [ -z "$DATABASE_USER" ] || [ -z "$DATABASE_NAME" ]
   exit 1
 fi
 
-PORT="${DATABASE_PORT:-3306}"
+DB_PORT="${DATABASE_PORT:-3306}"
 USER_ENC="$(uri_encode "$DATABASE_USER")"
 PASS_ENC="$(uri_encode "${DATABASE_PASSWORD:-}")"
 NAME_ENC="$(uri_encode "$DATABASE_NAME")"
 
-export DATABASE_URL="mysql://${USER_ENC}:${PASS_ENC}@${DATABASE_HOST}:${PORT}/${NAME_ENC}"
+export DATABASE_URL="mysql://${USER_ENC}:${PASS_ENC}@${DATABASE_HOST}:${DB_PORT}/${NAME_ENC}"
 
 echo "Running prisma migrate deploy..."
 npx prisma migrate deploy
