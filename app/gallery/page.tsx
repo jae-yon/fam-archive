@@ -15,8 +15,10 @@ import {
 import { usePhotos } from "@/hooks/use-galleries";
 
 export default function GalleryPage() {
-  const [selectedGalleryId, setSelectedGalleryId] =
-    useState<string>(ALL_GALLERY_ID);
+  // 선택된 갤러리 ID
+  const [selectedGalleryId, setSelectedGalleryId] = useState<string>(ALL_GALLERY_ID);
+  
+  // 사진 업로드 다이얼로그 열기 상태
   const [uploadOpen, setUploadOpen] = useState(false);
 
   const galleryId =

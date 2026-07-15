@@ -266,7 +266,7 @@ export function PhotoUploadDialog({ open, onOpenChange }: PhotoUploadDialogProps
             >
               <SelectTrigger
                 id="gallery-select"
-                className="w-full rounded-lg bg-zinc-100 text-zinc-600"
+                className="w-full rounded-2xl bg-zinc-100 text-zinc-600"
               >
                 <SelectValue
                   placeholder={
@@ -276,12 +276,12 @@ export function PhotoUploadDialog({ open, onOpenChange }: PhotoUploadDialogProps
                   }
                 />
               </SelectTrigger>
-              <SelectContent className="rounded-lg bg-zinc-100 shadow-none">
+              <SelectContent className="rounded-2xl bg-zinc-100 border border-zinc-100 shadow-none">
                 {galleries.map((gallery) => (
                   <SelectItem
                     key={gallery.id}
                     value={gallery.id}
-                    className="rounded-none text-zinc-600 hover:bg-zinc-200 hover:text-zinc-800"
+                    className="text-zinc-600 hover:bg-zinc-200 hover:text-zinc-800"
                   >
                     {gallery.title}
                   </SelectItem>
