@@ -125,13 +125,15 @@ interface GetPhotosOptions {
 export async function getPhotos(options: GetPhotosOptions) {
   const photos = await prisma.photo.findMany({
     where: {
-      galleries: options.galleryId ? {
-        some: {
-          galleryId: options.galleryId,
-        },
-      } : undefined,
+      galleries: options.galleryId
+        ? {
+            some: {
+              galleryId: options.galleryId,
+            },
+          }
+        : undefined,
     },
-    take: options.limit ?? 10,
+    ...(options.limit != null ? { take: options.limit } : {}),
     orderBy: { [options.sort ?? "createdAt"]: options.order ?? "desc" },
   });
 

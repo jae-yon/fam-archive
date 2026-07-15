@@ -64,8 +64,20 @@ export function useDeleteGallery() {
 
 export function useRecentPhotos() {
   return useQuery({
-    queryKey: ["photos"],
+    queryKey: ["photos", "recent"],
     queryFn: () => getPhotos({ limit: 10, sort: "createdAt", order: "desc" }),
+  });
+}
+
+export function usePhotos(galleryId?: string | null) {
+  return useQuery({
+    queryKey: ["photos", galleryId ?? "all"],
+    queryFn: () =>
+      getPhotos({
+        galleryId: galleryId ?? undefined,
+        sort: "createdAt",
+        order: "desc",
+      }),
   });
 }
 
