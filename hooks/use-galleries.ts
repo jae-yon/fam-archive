@@ -2,7 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getGalleries, getPhotos } from "@/app/actions/gallery-actions";
+import {
+  createGallery,
+  deleteGallery,
+  getGalleries,
+  getPhotos,
+  updateGallery,
+} from "@/app/actions/gallery-actions";
 
 import { UploadPhotosResponse, UploadPhotosInput } from '@/types/gallery';
 
@@ -10,6 +16,49 @@ export function useGalleries() {
   return useQuery({
     queryKey: ["galleries"],
     queryFn: () => getGalleries(),
+  });
+}
+
+export function useCreateGallery() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (title: string) => createGallery({ title }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["galleries"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+export function useUpdateGallery() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { id: string; title: string }) => updateGallery(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["galleries"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+export function useDeleteGallery() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteGallery({ id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["galleries"] });
+      await queryClient.invalidateQueries({ queryKey: ["photos"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
   });
 }
 
