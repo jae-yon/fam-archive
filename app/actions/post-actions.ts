@@ -19,15 +19,24 @@ interface GetPostsOptions {
 }
 
 // 게시글 목록 조회
-export async function getPosts(options: GetPostsOptions) {
+export async function getPosts(options: GetPostsOptions = {}) {
+  const limit = options.limit ?? 10;
+  const page = options.page ?? 1;
+  const search = options.search?.trim();
+
   const posts = await prisma.post.findMany({
-    take: options.limit ?? 10,
-    skip: (options.page ?? 1 - 1) * (options.limit ?? 10),
+    take: limit,
+    skip: (page - 1) * limit,
     where: {
-      title: {
-        contains: options.search ?? "",
-      },
-      categoryId: options.categoryId ?? undefined,
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search } },
+              { contentText: { contains: search } },
+            ],
+          }
+        : {}),
+      ...(options.categoryId ? { categoryId: options.categoryId } : {}),
     },
     orderBy: {
       [options.sort ?? "createdAt"]: options.order ?? "desc",
@@ -122,6 +131,92 @@ export async function deletePost(id: string) {
 
 // 게시글 카테고리 조회
 export async function getCategories() {
-  const categories = await prisma.category.findMany();
+  const categories = await prisma.category.findMany({
+    orderBy: { label: "asc" },
+  });
   return categories;
+}
+
+// 카테고리 생성
+export async function createCategory(data: { label: string }) {
+  const label = data.label.trim();
+
+  if (!label) {
+    throw new Error("카테고리 이름을 입력해주세요.");
+  }
+
+  const existing = await prisma.category.findFirst({
+    where: { label },
+  });
+
+  if (existing) {
+    throw new Error("이미 존재하는 카테고리 이름입니다.");
+  }
+
+  const category = await prisma.category.create({
+    data: { label },
+  });
+  return category;
+}
+
+// 카테고리 수정
+export async function updateCategory(data: { id: string; label: string }) {
+  const label = data.label.trim();
+
+  if (!label) {
+    throw new Error("카테고리 이름을 입력해주세요.");
+  }
+
+  const current = await prisma.category.findUnique({
+    where: { id: data.id },
+  });
+
+  if (!current) {
+    throw new Error("존재하지 않는 카테고리입니다.");
+  }
+
+  const existing = await prisma.category.findFirst({
+    where: {
+      label,
+      NOT: { id: data.id },
+    },
+  });
+
+  if (existing) {
+    throw new Error("이미 존재하는 카테고리 이름입니다.");
+  }
+
+  if (current.label === label) {
+    return current;
+  }
+
+  const category = await prisma.category.update({
+    where: { id: data.id },
+    data: { label },
+  });
+  return category;
+}
+
+// 카테고리 삭제
+export async function deleteCategory(data: { id: string }) {
+  const category = await prisma.category.findUnique({
+    where: { id: data.id },
+    include: {
+      posts: { select: { id: true }, take: 1 },
+    },
+  });
+
+  if (!category) {
+    throw new Error("존재하지 않는 카테고리입니다.");
+  }
+
+  if (category.posts.length > 0) {
+    throw new Error("카테고리에 게시글이 있어 삭제할 수 없습니다.");
+  }
+
+  await prisma.category.delete({
+    where: { id: data.id },
+  });
+
+  return { id: data.id };
 }

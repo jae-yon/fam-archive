@@ -6,17 +6,23 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { 
-  createPost, 
-  deletePost, 
-  updatePost, 
-  getCategories, 
-  getPost, 
-  getPosts, 
+import {
+  createCategory,
+  createPost,
+  deleteCategory,
+  deletePost,
+  getCategories,
+  getPost,
+  getPosts,
+  updateCategory,
+  updatePost,
 } from "@/app/actions/post-actions";
 
 import type { Post, PostContent, SavePostInput } from "@/types/post";
 
+/**
+ * 게시글 저장 입력 형식 변환
+ */
 function toSavePostInput(post: Post): SavePostInput {
   return {
     id: post.id || undefined,
@@ -30,13 +36,55 @@ function toSavePostInput(post: Post): SavePostInput {
   };
 }
 
+interface UsePostsOptions {
+  categoryId?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+  sort?: "createdAt" | "title";
+  order?: "asc" | "desc";
+}
+
+/**
+ * 게시글 목록 조회 (카테고리·검색·페이지 필터)
+ */
+export function usePosts(options: UsePostsOptions = {}) {
+  const {
+    categoryId,
+    search,
+    page = 1,
+    limit = 20,
+    sort = "createdAt",
+    order = "desc",
+  } = options;
+
+  return useQuery({
+    queryKey: ["posts", "list", { categoryId, search, page, limit, sort, order }],
+    queryFn: () =>
+      getPosts({
+        categoryId,
+        search,
+        page,
+        limit,
+        sort,
+        order,
+      }),
+  });
+}
+
+/**
+ * 최근 게시글 목록 조회 (최대 5개 메인 페이지에 노출)
+ */
 export function useRecentPosts() {
   return useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", "recent"],
     queryFn: () => getPosts({ limit: 5, sort: "createdAt", order: "desc" }),
   });
 }
 
+/**
+ * 게시글 상세 조회
+ */
 export function usePost(id: string) {
   return useQuery({
     queryKey: ["posts", id],
@@ -44,6 +92,9 @@ export function usePost(id: string) {
   });
 }
 
+/**
+ * 카테고리 목록 조회
+ */
 export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
@@ -51,6 +102,9 @@ export function useCategories() {
   });
 }
 
+/**
+ * 게시글 생성
+ */
 export function useCreatePost() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -64,6 +118,9 @@ export function useCreatePost() {
   });
 }
 
+/**
+ * 게시글 수정
+ */
 export function useUpdatePost() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -80,12 +137,68 @@ export function useUpdatePost() {
   });
 }
 
+/**
+ * 게시글 삭제
+ */
 export function useDeletePost() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deletePost(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+/**
+ * 카테고리 생성
+ */
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (label: string) => createCategory({ label }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+/**
+ * 카테고리 수정
+ */
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { id: string; label: string }) => updateCategory(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+/**
+ * 카테고리 삭제
+ */
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteCategory({ id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: (error) => {
       console.error(error);

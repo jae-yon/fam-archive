@@ -12,6 +12,9 @@ import {
 
 import { UploadPhotosResponse, UploadPhotosInput } from '@/types/gallery';
 
+/**
+ * 갤러리 목록 조회
+ */
 export function useGalleries() {
   return useQuery({
     queryKey: ["galleries"],
@@ -19,6 +22,9 @@ export function useGalleries() {
   });
 }
 
+/**
+ * 갤러리 생성
+ */
 export function useCreateGallery() {
   const queryClient = useQueryClient();
 
@@ -33,6 +39,9 @@ export function useCreateGallery() {
   });
 }
 
+/**
+ * 갤러리 수정
+ */
 export function useUpdateGallery() {
   const queryClient = useQueryClient();
 
@@ -47,6 +56,9 @@ export function useUpdateGallery() {
   });
 }
 
+/**
+ * 갤러리 삭제
+ */
 export function useDeleteGallery() {
   const queryClient = useQueryClient();
 
@@ -62,6 +74,9 @@ export function useDeleteGallery() {
   });
 }
 
+/**
+ * 최근 사진 목록 조회 (전체 사진 중 가장 최근 사진 10개 노출)
+ */
 export function useRecentPhotos() {
   return useQuery({
     queryKey: ["photos", "recent"],
@@ -69,6 +84,9 @@ export function useRecentPhotos() {
   });
 }
 
+/**
+ * 사진 목록 조회 (갤러리 페이지에서 사용, 갤러리 ID를 통해 필터링)
+ */
 export function usePhotos(galleryId?: string | null) {
   return useQuery({
     queryKey: ["photos", galleryId ?? "all"],
@@ -81,6 +99,9 @@ export function usePhotos(galleryId?: string | null) {
   });
 }
 
+/**
+ * 사진 업로드
+ */
 export function useUploadPhotos() {
   const queryClient = useQueryClient();
 
