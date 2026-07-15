@@ -56,7 +56,7 @@ function renderNextImage(
 ) {
   return (
     <div
-      className="group relative w-full overflow-hidden rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-sm"
+      className="group relative w-full overflow-hidden rounded-2xl transition-all duration-300 hover:scale-102 hover:shadow-sm"
       style={{ aspectRatio: `${width} / ${height}` }}
     >
       <Image
