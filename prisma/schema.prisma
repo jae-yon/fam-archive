@@ -114,3 +114,16 @@ model GalleryPhoto {
   @@index([photoId])
   @@map("gallery_photos")
 }
+
+model User {
+  id           String    @id @default(uuid())
+  alias        String?
+  email        String    @unique
+  username     String?   @unique
+  passwordHash String    @map("password_hash")
+
+  loginAt      DateTime? @map("login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("users")
+}
