@@ -1,14 +1,3 @@
-export type AuthTokenPayload = {
-  id: string;
-  email: string;
-};
-
-export type AuthUser = {
-  id: string;
-  email: string;
-  alias: string | null;
-};
-
 // 토큰 조회
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
