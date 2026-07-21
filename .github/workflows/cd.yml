@@ -110,6 +110,9 @@ jobs:
 
             DATABASE_URL=${{ secrets.DATABASE_URL }}
 
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION_TIME=${{ secrets.JWT_EXPIRATION_TIME }}
+
             UPLOADS_PATH="/uploads"
             DOCKER_UPLOADS_PATH=${{ secrets.UPLOADS_PATH }}
 
