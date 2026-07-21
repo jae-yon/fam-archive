@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import { toPhotoView } from "@/lib/photo-mapper";
 import { getUploadRootPath } from '@/lib/upload-path';
 
@@ -19,6 +20,8 @@ export async function getGalleries() {
 
 // 갤러리 생성
 export async function createGallery(data: { title: string }) {
+  await requireAuth();
+
   const title = data.title.trim();
 
   if (!title) {
@@ -41,6 +44,8 @@ export async function createGallery(data: { title: string }) {
 
 // 갤러리 수정
 export async function updateGallery(data: { id: string; title: string }) {
+  await requireAuth();
+
   const title = data.title.trim();
 
   if (!title) {
@@ -79,6 +84,8 @@ export async function updateGallery(data: { id: string; title: string }) {
 
 // 갤러리 삭제
 export async function deleteGallery(data: { id: string }) {
+  await requireAuth();
+
   const gallery = await prisma.gallery.findUnique({
     where: { id: data.id },
     include: {

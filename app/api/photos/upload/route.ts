@@ -4,6 +4,11 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { imageSize } from "image-size";
 
+import {
+  requireAuthFromRequest,
+  UnauthorizedError,
+  unauthorizedResponse,
+} from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUploadRootPath } from "@/lib/upload-path";
 import type { UploadPhotosResponse } from "@/types/gallery";
@@ -21,6 +26,8 @@ function safePathSegment(input: string) {
 
 export async function POST(request: Request) {
   try {
+    await requireAuthFromRequest(request);
+
     const formData = await request.formData();
     const galleryIdRaw = formData.get("galleryId");
 
@@ -128,8 +135,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (err) {
+    if (err instanceof UnauthorizedError) {
+      return unauthorizedResponse(err);
+    }
+
     const message = err instanceof Error ? err.message : "사진 업로드에 실패했습니다.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import argon2 from "argon2";
 
 import { prisma } from "@/lib/prisma";
+import { setAuthCookie } from "@/lib/auth";
 import { signAuthToken } from "@/lib/jwt";
 
 export const runtime = "nodejs";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
       data: { loginAt: new Date() },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -57,6 +58,10 @@ export async function POST(request: Request) {
       },
       access_token: token,
     });
+
+    setAuthCookie(response, token);
+
+    return response;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Internal server error";

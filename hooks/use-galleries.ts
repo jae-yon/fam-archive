@@ -10,6 +10,7 @@ import {
   updateGallery,
 } from "@/app/actions/gallery-actions";
 
+import { getAccessToken } from "@/lib/storage";
 import { UploadPhotosResponse, UploadPhotosInput } from '@/types/gallery';
 
 /**
@@ -107,6 +108,11 @@ export function useUploadPhotos() {
 
   return useMutation<UploadPhotosResponse, Error, UploadPhotosInput>({
     mutationFn: async ({ galleryId, files }) => {
+      const token = getAccessToken();
+      if (!token) {
+        throw new Error("권한이 없습니다.");
+      }
+
       const formData = new FormData();
       formData.set("galleryId", galleryId);
       for (const file of files) {
@@ -115,6 +121,9 @@ export function useUploadPhotos() {
 
       const res = await fetch("/api/photos/upload", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

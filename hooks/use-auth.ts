@@ -85,8 +85,12 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async (): Promise<void> => {
-      queryClient.setQueryData(["auth", "me"], null);
-      clearAccessToken();
+      try {
+        await fetch("/api/auth/logout", { method: "POST" });
+      } finally {
+        queryClient.setQueryData(["auth", "me"], null);
+        clearAccessToken();
+      }
     },
     onSuccess: () => {
       router.push("/");

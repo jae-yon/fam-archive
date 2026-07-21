@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
 import type { SavePostInput } from "@/types/post";
 
 interface GetPostsOptions {
@@ -62,6 +63,8 @@ export async function getPost(id: string) {
 
 // 게시글 생성
 export async function createPost(post: SavePostInput) {
+  await requireAuth();
+
   const newPost = await prisma.post.create({
     data: {
       title: post.title,
@@ -88,6 +91,8 @@ export async function createPost(post: SavePostInput) {
 
 // 게시글 수정
 export async function updatePost(post: SavePostInput & { id: string }) {
+  await requireAuth();
+
   const updatedPost = await prisma.post.update({
     where: {
       id: post.id,
@@ -116,6 +121,8 @@ export async function updatePost(post: SavePostInput & { id: string }) {
 
 // 게시글 삭제
 export async function deletePost(id: string) {
+  await requireAuth();
+
   const deletedPost = await prisma.post.delete({
     where: {
       id: id,
@@ -139,6 +146,8 @@ export async function getCategories() {
 
 // 카테고리 생성
 export async function createCategory(data: { label: string }) {
+  await requireAuth();
+
   const label = data.label.trim();
 
   if (!label) {
@@ -161,6 +170,8 @@ export async function createCategory(data: { label: string }) {
 
 // 카테고리 수정
 export async function updateCategory(data: { id: string; label: string }) {
+  await requireAuth();
+
   const label = data.label.trim();
 
   if (!label) {
@@ -199,6 +210,8 @@ export async function updateCategory(data: { id: string; label: string }) {
 
 // 카테고리 삭제
 export async function deleteCategory(data: { id: string }) {
+  await requireAuth();
+
   const category = await prisma.category.findUnique({
     where: { id: data.id },
     include: {
