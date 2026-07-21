@@ -89,7 +89,7 @@ export function useLogout() {
       clearAccessToken();
     },
     onSuccess: () => {
-      router.push("/login");
+      router.push("/");
       router.refresh();
     },
     onError: (error) => {

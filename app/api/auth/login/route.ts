@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "이메일 또는 비밀번호가 올바르지 않습니다." },
+        { error: "계정 정보가 올바르지 않습니다." },
         { status: 401 },
       );
     }
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const isValidPassword = await argon2.verify(user.passwordHash, password);
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: "이메일 또는 비밀번호가 올바르지 않습니다." },
+        { error: "계정 정보가 올바르지 않습니다." },
         { status: 401 },
       );
     }
