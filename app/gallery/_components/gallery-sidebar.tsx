@@ -50,11 +50,16 @@ const itemClassName =
   "flex w-full cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-left text-sm font-medium transition-all duration-300";
 
 interface GallerySidebarProps {
+  authorized: boolean;
   selectedId: string;
   onSelect: (id: string) => void;
 }
 
-export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
+export function GallerySidebar({
+  authorized,
+  selectedId,
+  onSelect,
+}: GallerySidebarProps) {
   const { data: galleries, isLoading, isError } = useGalleries();
   const {
     mutate: createGallery,
@@ -88,6 +93,19 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
   const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (authorized) return;
+
+    setIsCreating(false);
+    setNewTitle("");
+    setEditingId(null);
+    setEditTitle("");
+    setDeleteTarget(null);
+    resetCreate();
+    resetUpdate();
+    resetDelete();
+  }, [authorized, resetCreate, resetUpdate, resetDelete]);
+
+  useEffect(() => {
     if (isCreating) {
       createInputRef.current?.focus();
     }
@@ -105,6 +123,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
   };
 
   const handleOpenCreate = () => {
+    if (!authorized) return;
+
     resetCreate();
     resetUpdate();
     setEditingId(null);
@@ -114,6 +134,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
   };
 
   const handleCancelCreate = () => {
+    if (!authorized) return;
+
     resetCreate();
     setIsCreating(false);
     setNewTitle("");
@@ -121,6 +143,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
 
   const handleSubmitCreate = (event: FormEvent) => {
     event.preventDefault();
+    if (!authorized) return;
+
     const title = newTitle.trim();
     if (!title || isCreatingGallery) return;
 
@@ -135,6 +159,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
 
   // 수정 시작 핸들러
   const handleStartEdit = (gallery: { id: string; title: string }) => {
+    if (!authorized) return;
+
     resetCreate();
     resetUpdate();
     setIsCreating(false);
@@ -146,6 +172,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
 
   // 수정 취소 핸들러
   const handleCancelEdit = () => {
+    if (!authorized) return;
+
     resetUpdate();
     setEditingId(null);
     setEditTitle("");
@@ -154,6 +182,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
   // 수정 제출 핸들러
   const handleSubmitEdit = (event: FormEvent) => {
     event.preventDefault();
+    if (!authorized) return;
+
     if (!editingId || isUpdatingGallery) return;
 
     const title = editTitle.trim();
@@ -172,6 +202,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
 
   // 삭제 요청 핸들러
   const handleRequestDelete = (gallery: { id: string; title: string }) => {
+    if (!authorized) return;
+
     resetDelete();
     onSelect(gallery.id);
     setDeleteTarget(gallery);
@@ -179,7 +211,7 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
 
   // 삭제 확인 핸들러
   const handleConfirmDelete = () => {
-    if (!deleteTarget || isDeletingGallery) return;
+    if (!authorized || !deleteTarget || isDeletingGallery) return;
 
     const targetId = deleteTarget.id;
     deleteGallery(targetId, {
@@ -233,6 +265,8 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
             const isEditing = editingId === gallery.id;
 
             if (isEditing) {
+              if (!authorized) return null;
+
               return (
                 <form
                   key={gallery.id}
@@ -266,7 +300,7 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
                     <Button
                       type="submit"
                       variant="secondary"
-                      disabled={!editTitle.trim() || isUpdatingGallery}
+                      disabled={!editTitle.trim() || isUpdatingGallery || !authorized}
                     >
                       <Check className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
                     </Button>
@@ -274,7 +308,7 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
                       type="button"
                       variant="secondary"
                       onClick={handleCancelEdit}
-                      disabled={isUpdatingGallery}
+                      disabled={isUpdatingGallery || !authorized}
                     >
                       <Undo2 className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
                     </Button>
@@ -306,7 +340,7 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
                   <span className="truncate">{gallery.title}</span>
                 </button>
 
-                {isActive && (
+                {isActive && authorized && (
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={
@@ -340,112 +374,118 @@ export function GallerySidebar({ selectedId, onSelect }: GallerySidebarProps) {
             );
           })}
 
-        <Separator className="my-1" />
+        {authorized && (
+          <>
+            <Separator className="my-1" />
 
-        {isCreating ? (
-          <form
-            onSubmit={handleSubmitCreate}
-            className="mt-1 flex flex-col gap-2 px-1"
-          >
-            <Input
-              ref={createInputRef}
-              value={newTitle}
-              onChange={(event) => {
-                if (createError) resetCreate();
-                setNewTitle(event.target.value);
-              }}
-              placeholder="갤러리 이름"
-              aria-label="갤러리 이름"
-              aria-invalid={!!createError}
-              disabled={isCreatingGallery}
-              className="h-9 rounded-full px-3"
-              onKeyDown={(event) => {
-                if (event.key === "Escape" && !isCreatingGallery) {
-                  handleCancelCreate();
-                }
-              }}
-            />
-            {createError && (
-              <p className="px-1 text-xs text-destructive">
-                {createError.message}
-              </p>
-            )}
-            <div className="flex items-center justify-end gap-1">
-              <Button
-                type="submit"
-                variant="secondary"
-                disabled={!newTitle.trim() || isCreatingGallery}
+            {isCreating ? (
+              <form
+                onSubmit={handleSubmitCreate}
+                className="mt-1 flex flex-col gap-2 px-1"
               >
-                <Plus className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
-              </Button>
-              <Button
+                <Input
+                  ref={createInputRef}
+                  value={newTitle}
+                  onChange={(event) => {
+                    if (createError) resetCreate();
+                    setNewTitle(event.target.value);
+                  }}
+                  placeholder="갤러리 이름"
+                  aria-label="갤러리 이름"
+                  aria-invalid={!!createError}
+                  disabled={isCreatingGallery}
+                  className="h-9 rounded-full px-3"
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape" && !isCreatingGallery) {
+                      handleCancelCreate();
+                    }
+                  }}
+                />
+                {createError && (
+                  <p className="px-1 text-xs text-destructive">
+                    {createError.message}
+                  </p>
+                )}
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    disabled={!newTitle.trim() || isCreatingGallery}
+                  >
+                    <Plus className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleCancelCreate}
+                    disabled={isCreatingGallery}
+                  >
+                    <Undo2 className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <button
                 type="button"
-                variant="secondary"
-                onClick={handleCancelCreate}
-                disabled={isCreatingGallery}
+                onClick={handleOpenCreate}
+                className={cn(
+                  itemClassName,
+                  "text-zinc-500 border border-zinc-200 border-dashed hover:bg-zinc-100 hover:text-zinc-800 hover:border-zinc-300",
+                )}
               >
-                <Undo2 className="size-3 shrink-0 stroke-[2.25]" aria-hidden />
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <button
-            type="button"
-            onClick={handleOpenCreate}
-            className={cn(
-              itemClassName,
-              "text-zinc-500 border border-zinc-200 border-dashed hover:bg-zinc-100 hover:text-zinc-800 hover:border-zinc-300",
+                <Plus className="size-4 shrink-0 stroke-[2.25]" aria-hidden />
+                <span className="truncate">갤러리 추가</span>
+              </button>
             )}
-          >
-            <Plus className="size-4 shrink-0 stroke-[2.25]" aria-hidden />
-            <span className="truncate">갤러리 추가</span>
-          </button>
+          </>
         )}
       </nav>
 
-      <AlertDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open && !isDeletingGallery) {
-            resetDelete();
-            setDeleteTarget(null);
-          }
-        }}
-      >
-        <AlertDialogContent className="shadow-sm" size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="bg-red-500/10 p-2.5 rounded-full">
-              <TrashIcon className="h-6 w-6 text-red-500" />
-            </AlertDialogTitle>
-            <AlertDialogDescription className="mt-2 text-sm font-normal">
-              <span className="font-medium">
-                &quot;{deleteTarget?.title}&quot;
-              </span>{" "}
-              갤러리를 삭제합니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {deleteError && (
-            <p className="text-center text-xs text-destructive">
-              {deleteError.message}
-            </p>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeletingGallery}>
-              취소
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              disabled={isDeletingGallery}
-              onClick={(event) => {
-                event.preventDefault();
-                handleConfirmDelete();
-              }}
-            >
-              삭제
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {authorized && (
+        <AlertDialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open && !isDeletingGallery) {
+              resetDelete();
+              setDeleteTarget(null);
+            }
+          }}
+        >
+          <AlertDialogContent className="shadow-sm" size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="bg-red-500/10 p-2.5 rounded-full">
+                <TrashIcon className="h-6 w-6 text-red-500" />
+              </AlertDialogTitle>
+              <AlertDialogDescription className="mt-2 text-sm font-normal">
+                <span className="font-medium">
+                  &quot;{deleteTarget?.title}&quot;
+                </span>{" "}
+                갤러리를 삭제합니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            {deleteError && (
+              <p className="text-center text-xs text-destructive">
+                {deleteError.message}
+              </p>
+            )}
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeletingGallery}>
+                취소
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                disabled={isDeletingGallery}
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleConfirmDelete();
+                }}
+              >
+                삭제
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </aside>
   );
 }

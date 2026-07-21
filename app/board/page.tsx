@@ -3,13 +3,13 @@
 import { FileX2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useGetUser } from "@/hooks/use-auth";
 import { useCategories, usePosts } from "@/hooks/use-posts";
 
 import { Category, Post } from "@/types/post";
 
 import { BoardMenubar } from "@/app/board/_components/board-menubar";
 
-import { Container } from "@/components/common/container";
 import { PostSheet } from "@/components/common/post-sheet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -18,33 +18,38 @@ import { formatDate } from "@/lib/date";
 const ALL_CATEGORY: Category = {id: "all", label: "전체"};
 
 export default function BoardPage() {
-  // 카테고리 목록 상태값
+  const { data: user } = useGetUser();
+
+  const [authorized, setAuthorized] = useState(false);
   const [categoryList, setCategoryList] = useState<Category[]>([ALL_CATEGORY]);
-  // 선택된 카테고리 상태값
   const [selectedCategory, setSelectedCategory] = useState<Category>(ALL_CATEGORY);
-  // 검색어 상태값
   const [search, setSearch] = useState("");
-
-  // 게시글 모달 상태값
   const [isOpen, setIsOpen] = useState(false);
-  // 게시글 모달 모드 상태값
   const [mode, setMode] = useState<"edit" | "view">("edit");
-  // 선택된 게시글 상태값
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
-
-  // 게시글 조회 옵션 상태값
-  const [options, setOptions] = useState<{ 
-    categoryId: string | undefined; 
-    search: string | undefined; 
-  }>({ 
-    categoryId: selectedCategory.id, 
-    search: search.trim() || undefined 
+  const [options, setOptions] = useState<{
+    categoryId: string | undefined;
+    search: string | undefined;
+  }>({
+    categoryId: selectedCategory.id,
+    search: search.trim() || undefined,
   });
 
-  // 카테고리 목록 조회 상태값
   const { data: categories } = useCategories();
 
-  // 카테고리 목록 조회 후 상태값 업데이트
+  useEffect(() => {
+    setAuthorized(user ? true : false);
+  }, [user]);
+
+  useEffect(() => {
+    if (authorized) return;
+
+    if (isOpen && mode === "edit") {
+      setIsOpen(false);
+      setSelectedPost(undefined);
+    }
+  }, [authorized, isOpen, mode]);
+
   useEffect(() => {
     if (categories) {
       setCategoryList([ ALL_CATEGORY, ...categories ]);
@@ -64,6 +69,8 @@ export default function BoardPage() {
 
   // 게시글 작성 함수 (edit 모드로 postsheet 열기)
   const handleEdit = () => {
+    if (!authorized) return;
+
     setSelectedPost(undefined);
     setMode("edit");
     setIsOpen(true);
@@ -81,6 +88,7 @@ export default function BoardPage() {
   return (
     <div className="flex flex-1 flex-col">
       <BoardMenubar
+        authorized={authorized}
         categories={categoryList}
         selectedCategory={selectedCategory}
         onSelectedCategoryChange={setSelectedCategory}
@@ -127,7 +135,14 @@ export default function BoardPage() {
 
       </div>
 
-      <PostSheet open={isOpen} mode={mode} post={selectedPost ?? undefined} onOpenChange={setIsOpen} onModeChange={setMode} />
+      <PostSheet
+        authorized={authorized}
+        open={isOpen}
+        mode={mode}
+        post={selectedPost ?? undefined}
+        onOpenChange={setIsOpen}
+        onModeChange={setMode}
+      />
     </div>
   );
 }

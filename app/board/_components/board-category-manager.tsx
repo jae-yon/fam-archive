@@ -39,7 +39,11 @@ import {
   useUpdateCategory,
 } from "@/hooks/use-posts";
 
-export function BoardCategoryManager() {
+interface BoardCategoryManagerProps {
+  isAuthorized: boolean;
+}
+
+export function BoardCategoryManager({ isAuthorized }: BoardCategoryManagerProps) {
   const { data: categories, isLoading, isError } = useCategories();
   const {
     mutate: createCategory,
@@ -85,6 +89,8 @@ export function BoardCategoryManager() {
   useEffect(() => {
     if (editingId) editInputRef.current?.focus();
   }, [editingId]);
+
+  if (!isAuthorized) return null;
 
   // 생성 버튼 클릭 시 상태값 초기화 및 생성 상태값 설정
   const handleOpenCreate = () => {

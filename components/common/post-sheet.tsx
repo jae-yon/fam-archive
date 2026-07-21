@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircleIcon, AlertTriangleIcon, PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { 
@@ -42,6 +42,7 @@ interface PostSheetProps {
   open: boolean;
   post?: Post;
   mode: "edit" | "view";
+  authorized: boolean;
   onOpenChange: (open: boolean) => void;
   onModeChange: (mode: "edit" | "view") => void;
 }
@@ -65,19 +66,42 @@ const initialPost = (): Post => ({
   images: [],
 });
 
-export function PostSheet({ open, post, mode, onOpenChange, onModeChange }: PostSheetProps) {
+export function PostSheet({
+  open,
+  post,
+  mode,
+  authorized,
+  onOpenChange,
+  onModeChange,
+}: PostSheetProps) {
+  const sheetMode = authorized ? mode : "view";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      {mode === "edit" ? (
+      {sheetMode === "edit" ? (
         <PostForm open={open} data={post} onOpenChange={onOpenChange} />
       ) : (
-        <PostView open={open} data={post} onOpenChange={onOpenChange} onModeChange={onModeChange} />
+        <PostView
+          authorized={authorized}
+          open={open}
+          data={post}
+          onOpenChange={onOpenChange}
+          onModeChange={onModeChange}
+        />
       )}
     </Sheet>
   );
 }
 
-function PostForm({ open, data, onOpenChange }: { open: boolean; data?: Post; onOpenChange: (open: boolean) => void }) {
+function PostForm({
+  open,
+  data,
+  onOpenChange,
+}: {
+  open: boolean;
+  data?: Post;
+  onOpenChange: (open: boolean) => void;
+}) {
   // 카테고리 데이터 조회
   const { data: categoriesData } = useCategories();
 
@@ -185,12 +209,26 @@ function PostForm({ open, data, onOpenChange }: { open: boolean; data?: Post; on
   );
 }
 
-function PostView({ open, data, onOpenChange, onModeChange }: { open: boolean; data?: Post; onOpenChange: (open: boolean) => void; onModeChange: (mode: "edit" | "view") => void }) {
-  if (!data) return null;
-
+function PostView({
+  authorized,
+  open,
+  data,
+  onOpenChange,
+  onModeChange,
+}: {
+  authorized: boolean;
+  open: boolean;
+  data?: Post;
+  onOpenChange: (open: boolean) => void;
+  onModeChange: (mode: "edit" | "view") => void;
+}) {
   const { mutate: deletePost } = useDeletePost();
 
+  if (!data) return null;
+
   const handleConfirmDelete = () => {
+    if (!authorized) return;
+
     deletePost(data.id, {
       onSuccess: () => {
         onOpenChange(false);
@@ -223,36 +261,38 @@ function PostView({ open, data, onOpenChange, onModeChange }: { open: boolean; d
 
       <Separator />
 
-      <SheetFooter>
-        <Button variant="secondary" className="text-sm font-normal tracking-widest" onClick={() => onModeChange("edit")}>
-          <PencilIcon className="w-4 h-4" />
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button variant="destructive" className="text-sm font-normal tracking-widest" />
-            }
-          >
-            <TrashIcon className="w-4 h-4" />
-          </AlertDialogTrigger>
-          <AlertDialogContent className="shadow-sm" size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="bg-red-500/10 p-2.5 rounded-full">
-                <TrashIcon className="w-6 h-6 text-red-500" />
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-sm font-normal mt-2">
-                <span className="font-medium">"{data.title}"</span> 게시글을 영구적으로 삭제합니다.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>취소</AlertDialogCancel>
-              <AlertDialogAction variant="destructive" onClick={handleConfirmDelete}>
-                삭제
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </SheetFooter>
+      {authorized && (
+        <SheetFooter>
+          <Button variant="secondary" className="text-sm font-normal tracking-widest" onClick={() => onModeChange("edit")}>
+            <PencilIcon className="w-4 h-4" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button variant="destructive" className="text-sm font-normal tracking-widest" />
+              }
+            >
+              <TrashIcon className="w-4 h-4" />
+            </AlertDialogTrigger>
+            <AlertDialogContent className="shadow-sm" size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="bg-red-500/10 p-2.5 rounded-full">
+                  <TrashIcon className="w-6 h-6 text-red-500" />
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm font-normal mt-2">
+                  <span className="font-medium">"{data.title}"</span> 게시글을 영구적으로 삭제합니다.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>취소</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={handleConfirmDelete}>
+                  삭제
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </SheetFooter>
+      )}
     </SheetContent>
   );
 }

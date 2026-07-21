@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileX2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -10,20 +11,31 @@ import {
   CardDescription, 
   CardTitle 
 } from "@/components/ui/card";
+
 import { PostSheet } from "@/components/common/post-sheet";
 
 import { formatDate } from "@/lib/date";
 
 import { useRecentPosts } from "@/hooks/use-posts";
-import { Post } from '@/types/post';
+import { useGetUser } from "@/hooks/use-auth";
+
+import { Post } from "@/types/post";
 
 export function Board() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [mode, setMode] = useState<"edit" | "view">("edit");
 
-  const { data: recentPosts } = useRecentPosts();
+  const [authorized, setAuthorized] = useState(false);
+  
+  const { data: user } = useGetUser();
+  
+  // 사용자 정보가 조회된다면, 권한 상태를 업데이트
+  useEffect(() => {
+    setAuthorized(user ? true : false);
+  }, [user]);
 
+  const { data: recentPosts } = useRecentPosts();
   // 게시글 작성 함수 (edit 모드로 postsheet 열기)
   const handleEdit = () => {
     setSelectedPost(undefined);
@@ -45,7 +57,9 @@ export function Board() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold tracking-tight ps-2">최근 게시글</h1>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleEdit}>게시글 작성</Button>
+          {authorized && (
+            <Button onClick={handleEdit}>게시글 작성</Button>
+          )}
           <Button variant="outline">전체 목록 보기</Button>
         </div>
       </div>
@@ -80,7 +94,14 @@ export function Board() {
         </div>
       )}
 
-      <PostSheet open={isOpen} mode={mode} post={selectedPost ?? undefined} onOpenChange={setIsOpen} onModeChange={setMode} />
+      <PostSheet
+        authorized={authorized}
+        open={isOpen}
+        mode={mode}
+        post={selectedPost ?? undefined}
+        onOpenChange={setIsOpen}
+        onModeChange={setMode}
+      />
     </div>
   );
 }

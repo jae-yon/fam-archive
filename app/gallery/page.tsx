@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImageOff, ImagePlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,19 @@ import {
   ALL_GALLERY_ID,
   GallerySidebar,
 } from "@/app/gallery/_components/gallery-sidebar";
+import { useGetUser } from "@/hooks/use-auth";
 import { usePhotos } from "@/hooks/use-galleries";
 
 export default function GalleryPage() {
-  // 선택된 갤러리 ID
+  const { data: user } = useGetUser();
+
+  const [authorized, setAuthorized] = useState(false);
   const [selectedGalleryId, setSelectedGalleryId] = useState<string>(ALL_GALLERY_ID);
-  
-  // 사진 업로드 다이얼로그 열기 상태
   const [uploadOpen, setUploadOpen] = useState(false);
+
+  useEffect(() => {
+    setAuthorized(user ? true : false);
+  }, [user]);
 
   const galleryId =
     selectedGalleryId === ALL_GALLERY_ID ? null : selectedGalleryId;
@@ -28,19 +33,22 @@ export default function GalleryPage() {
   return (
     <div className="flex flex-1">
       <GallerySidebar
+        authorized={authorized}
         selectedId={selectedGalleryId}
         onSelect={setSelectedGalleryId}
       />
       <div className="min-w-0 flex-1">
         {/* 사진 추가 버튼 (우측 상단 배치, 포토 업로드 다이얼로그 열기) */}
         <div className="flex justify-end border-b border-border px-4 py-2">
-          <Button
-            size="icon"
-            aria-label="사진 추가"
-            onClick={() => setUploadOpen(true)}
-          >
-            <ImagePlus className="size-4 stroke-[2.25]" aria-hidden />
-          </Button>
+          {authorized && (
+            <Button
+              size="icon"
+              aria-label="사진 추가"
+              onClick={() => setUploadOpen(true)}
+            >
+              <ImagePlus className="size-4 stroke-[2.25]" aria-hidden />
+            </Button>
+          )}
         </div>
 
         {isLoading && (
@@ -73,7 +81,7 @@ export default function GalleryPage() {
           </div>
         )}
 
-        <PhotoUploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+        <PhotoUploadDialog open={uploadOpen} onOpenChange={setUploadOpen} authorized={authorized} />
       </div>
     </div>
   );

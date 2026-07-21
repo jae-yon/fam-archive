@@ -45,6 +45,7 @@ interface SelectedPhotoFile {
 export interface PhotoUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  authorized: boolean;
 }
 
 // 파일 크기 포맷팅
@@ -78,7 +79,7 @@ function revokePreviewUrls(files: SelectedPhotoFile[]) {
   }
 }
 
-export function PhotoUploadDialog({ open, onOpenChange }: PhotoUploadDialogProps) {
+export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploadDialogProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -129,6 +130,8 @@ export function PhotoUploadDialog({ open, onOpenChange }: PhotoUploadDialogProps
       revokePreviewUrls(selectedFilesRef.current);
     };
   }, []);
+
+  if (!authorized) return null;
 
   // 파일 검증
   const validateFiles = (files: File[]) => {

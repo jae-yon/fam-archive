@@ -11,6 +11,7 @@ import { BoardCategoryManager } from "@/app/board/_components/board-category-man
 import { Category } from "@/types/post";
 
 interface BoardMenubarProps {
+  authorized: boolean;
   categories: Category[];
   selectedCategory: Category;
   onSelectedCategoryChange: (category: Category) => void;
@@ -20,6 +21,7 @@ interface BoardMenubarProps {
 }
 
 export function BoardMenubar({
+  authorized,
   categories,
   selectedCategory,
   onSelectedCategoryChange,
@@ -40,16 +42,20 @@ export function BoardMenubar({
         onValueChange={(value) => onSearchChange(value ? value : undefined)} 
       />
 
-      <Button
-        size="icon"
-        type="button"
-        aria-label="게시글 작성"
-        onClick={onCreatePost}
-      >
-        <Pencil className="size-4 stroke-[2.25]" aria-hidden />
-      </Button>
-
-      <BoardCategoryManager />
+      {authorized && (
+        <>
+          <Button
+            size="icon"
+            type="button"
+            aria-label="게시글 작성"
+            onClick={onCreatePost}
+          >
+            <Pencil className="size-4 stroke-[2.25]" aria-hidden />
+          </Button>
+        
+          <BoardCategoryManager isAuthorized={authorized} />
+        </>
+      )}
     </div>
   );
 }
