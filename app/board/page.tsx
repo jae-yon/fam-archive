@@ -1,7 +1,7 @@
 "use client";
 
 import { FileX2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useGetUser } from "@/hooks/use-auth";
 import { useCategories, usePosts } from "@/hooks/use-posts";
@@ -20,52 +20,27 @@ const ALL_CATEGORY: Category = {id: "all", label: "전체"};
 export default function BoardPage() {
   const { data: user } = useGetUser();
 
-  const [authorized, setAuthorized] = useState(false);
-  const [categoryList, setCategoryList] = useState<Category[]>([ALL_CATEGORY]);
   const [selectedCategory, setSelectedCategory] = useState<Category>(ALL_CATEGORY);
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<"edit" | "view">("edit");
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
-  const [options, setOptions] = useState<{
-    categoryId: string | undefined;
-    search: string | undefined;
-  }>({
-    categoryId: selectedCategory.id,
-    search: search.trim() || undefined,
-  });
 
   const { data: categories } = useCategories();
 
-  useEffect(() => {
-    setAuthorized(user ? true : false);
-  }, [user]);
+  // 사용자 정보가 조회되었다면 권한이 있는 것으로 판단
+  const authorized = !!user;
 
-  useEffect(() => {
-    if (authorized) return;
+  const categoryList = categories ? [ ALL_CATEGORY, ...categories ] : [ ALL_CATEGORY ];
 
-    if (isOpen && mode === "edit") {
-      setIsOpen(false);
-      setSelectedPost(undefined);
-    }
-  }, [authorized, isOpen, mode]);
+  // 권한이 없으면 작성 모드 시트는 열린 상태로 두지 않는다
+  const isSheetOpen = isOpen && (authorized || mode !== "edit");
 
-  useEffect(() => {
-    if (categories) {
-      setCategoryList([ ALL_CATEGORY, ...categories ]);
-    }
-  }, [categories]);
-
-  // 검색어, 카테고리 변경 시 게시글 조회 옵션 업데이트
-  useEffect(() => {
-    setOptions({
-      categoryId: selectedCategory.id === ALL_CATEGORY.id ? undefined : selectedCategory.id,
-      search: search.trim() || undefined
-    });
-  }, [selectedCategory, search]);
-
-  // 게시글 목록 조회 상태값
-  const { data: posts, isLoading: isPostsLoading, isError: isPostsError } = usePosts(options);
+  // 게시글 목록 조회 상태값 (검색어·카테고리에서 조회 옵션 도출)
+  const { data: posts, isLoading: isPostsLoading, isError: isPostsError } = usePosts({
+    categoryId: selectedCategory.id === ALL_CATEGORY.id ? undefined : selectedCategory.id,
+    search: search.trim() || undefined,
+  });
 
   // 게시글 작성 함수 (edit 모드로 postsheet 열기)
   const handleEdit = () => {
@@ -137,7 +112,7 @@ export default function BoardPage() {
 
       <PostSheet
         authorized={authorized}
-        open={isOpen}
+        open={isSheetOpen}
         mode={mode}
         post={selectedPost ?? undefined}
         onOpenChange={setIsOpen}

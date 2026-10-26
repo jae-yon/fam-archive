@@ -1,7 +1,7 @@
 "use client";
 
 import { PencilIcon, SaveIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { 
   Sheet, 
@@ -33,7 +33,7 @@ import { Editor } from "@/components/editor/editor";
 import { Viewer } from "@/components/editor/viewer";
 import { Separator } from "@/components/ui/separator";
 import { DatePickerInput } from "@/components/common/date-picker";
-import { Category, Post } from "@/types/post";
+import { Post } from "@/types/post";
 
 import { useCategories, useCreatePost, useDeletePost, useUpdatePost } from "@/hooks/use-posts";
 import { formatDate } from "@/lib/date";
@@ -105,13 +105,8 @@ function PostForm({
   // 카테고리 데이터 조회
   const { data: categoriesData } = useCategories();
 
-  // 카테고리 항목 상태값 정의
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  // 카테고리 항목 데이터를 상태값에 반영
-  useEffect(() => {
-    setCategories(categoriesData ?? []);
-  }, [categoriesData]);
+  // 카테고리 항목
+  const categories = categoriesData ?? [];
 
   // 게시글 상태값 정의 및 초기화
   const [post, setPost] = useState<Post>(data ?? initialPost());
@@ -121,11 +116,16 @@ function PostForm({
   // 게시글 수정 함수 정의
   const { mutate: updatePost } = useUpdatePost();
 
-  // 게시글 기본 상태값 초기화
-  useEffect(() => {
-    if (!open) return;
-    setPost(data ?? initialPost());
-  }, [open, data]);
+  // 시트가 열릴 때 또는 대상 게시글이 바뀔 때 기본 상태값 초기화
+  const [prevKey, setPrevKey] = useState({ open, data });
+
+  if (prevKey.open !== open || prevKey.data !== data) {
+    setPrevKey({ open, data });
+
+    if (open) {
+      setPost(data ?? initialPost());
+    }
+  }
 
   // 게시글 저장 함수 정의
   const handleSubmit = () => {
@@ -280,7 +280,7 @@ function PostView({
                   <TrashIcon className="w-6 h-6 text-red-500" />
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-sm font-normal mt-2">
-                  <span className="font-medium">"{data.title}"</span> 게시글을 영구적으로 삭제합니다.
+                  <span className="font-medium">&quot;{data.title}&quot;</span> 게시글을 영구적으로 삭제합니다.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

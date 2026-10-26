@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FileX2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,14 +26,10 @@ export function Board() {
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [mode, setMode] = useState<"edit" | "view">("edit");
 
-  const [authorized, setAuthorized] = useState(false);
-  
   const { data: user } = useGetUser();
-  
-  // 사용자 정보가 조회된다면, 권한 상태를 업데이트
-  useEffect(() => {
-    setAuthorized(user ? true : false);
-  }, [user]);
+
+  // 사용자 정보가 조회되었다면 권한이 있는 것으로 판단
+  const authorized = !!user;
 
   const { data: recentPosts } = useRecentPosts();
   // 게시글 작성 함수 (edit 모드로 postsheet 열기)

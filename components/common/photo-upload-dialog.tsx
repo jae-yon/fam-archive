@@ -103,9 +103,12 @@ export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploa
   // 드래그 상태
   const [isDragging, setIsDragging] = useState(false);
   
-  // 선택된 파일 목록 참조
+  // 선택된 파일 목록 참조 (언마운트 정리에서 최신 목록을 읽기 위함)
   const selectedFilesRef = useRef(selectedFiles);
-  selectedFilesRef.current = selectedFiles;
+
+  useEffect(() => {
+    selectedFilesRef.current = selectedFiles;
+  }, [selectedFiles]);
 
   const totalSize = selectedFiles.reduce((sum, item) => sum + item.file.size, 0);
 
@@ -119,11 +122,14 @@ export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploa
     setIsDragging(false);
   }, []); 
 
-  useEffect(() => {
-    if (!open) {
+  // 다이얼로그가 닫히면 선택 상태를 초기화
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
       resetState();
     }
-  }, [open, resetState]);
+
+    onOpenChange(nextOpen);
+  };
 
   useEffect(() => {
     return () => {
@@ -240,7 +246,7 @@ export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploa
       },
       {
         onSuccess: () => {
-          onOpenChange(false);
+          handleOpenChange(false);
         },
         onError: (err) => {
           setError(err.message || "사진 업로드에 실패했습니다.");
@@ -253,7 +259,7 @@ export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploa
     selectedFiles.length > 0 && selectedGallery !== null && !isUploading;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="flex max-h-[min(90vh,48rem)] w-full max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogHeader className="border-b px-6 py-5">
           <DialogTitle className="text-lg font-semibold">사진 업로드</DialogTitle>
@@ -449,7 +455,7 @@ export function PhotoUploadDialog({ open, onOpenChange, authorized }: PhotoUploa
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isUploading}
             className="font-normal"
           >
