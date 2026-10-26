@@ -4,6 +4,7 @@ on:
   push:
     paths-ignore:
       - 'README.md'
+      - 'CHANGELOG.md'
 
 jobs:
   # 린트·타입체크 (next build는 ESLint를 실행하지 않으므로 별도 검증)

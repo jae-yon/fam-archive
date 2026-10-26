@@ -63,6 +63,8 @@
 
   Prisma Client는 gitignore 대상이라 린트·타입체크 전에 생성해야 하며, `prisma.config.ts`가 `DATABASE_URL`을 읽으므로 Dockerfile과 동일한 더미 값을 주입합니다. Node 버전은 Dockerfile의 `node:22`에 맞췄습니다.
 
+  `paths-ignore`에 `CHANGELOG.md`를 추가해 문서만 바뀐 푸시는 CI를 건너뜁니다. 변경된 파일이 모두 패턴에 해당할 때만 건너뛰므로, 코드와 문서를 함께 수정한 커밋은 그대로 실행됩니다.
+
 - **`npm run typecheck` 스크립트** — `next typegen && tsc --noEmit`. 라우트 타입은 `next dev`·`next build` 시점에만 생성되어 `tsc` 단독 실행으로는 검증되지 않고, 신규 체크아웃에는 `next-env.d.ts`도 없어 `tsc`가 실패합니다.
 
 ### Known Issues
