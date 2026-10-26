@@ -4,9 +4,41 @@ on:
   push:
     paths-ignore:
       - 'README.md'
+      - 'CHANGELOG.md'
 
 jobs:
+  # 린트·타입체크 (next build는 ESLint를 실행하지 않으므로 별도 검증)
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Prisma Client는 커밋되지 않으므로 린트·타입체크 전에 생성
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+        env:
+          DATABASE_URL: mysql://build:build@localhost:3306/build
+
+      - name: Lint
+        run: npm run lint
+
+      # next typegen으로 라우트 타입을 생성한 뒤 tsc 실행
+      - name: Typecheck
+        run: npm run typecheck
+
   build:
+    needs: verify
     runs-on: ubuntu-latest
 
     steps:

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ImageOff, ImagePlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,11 @@ import { usePhotos } from "@/hooks/use-galleries";
 export default function GalleryPage() {
   const { data: user } = useGetUser();
 
-  const [authorized, setAuthorized] = useState(false);
   const [selectedGalleryId, setSelectedGalleryId] = useState<string>(ALL_GALLERY_ID);
   const [uploadOpen, setUploadOpen] = useState(false);
 
-  useEffect(() => {
-    setAuthorized(user ? true : false);
-  }, [user]);
+  // 사용자 정보가 조회되었다면 권한이 있는 것으로 판단
+  const authorized = !!user;
 
   const galleryId =
     selectedGalleryId === ALL_GALLERY_ID ? null : selectedGalleryId;

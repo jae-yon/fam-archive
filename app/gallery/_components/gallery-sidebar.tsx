@@ -92,14 +92,25 @@ export function GallerySidebar({
   const createInputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
+  // 권한을 잃으면 편집 중이던 입력 상태를 초기화
+  const [prevAuthorized, setPrevAuthorized] = useState(authorized);
+
+  if (prevAuthorized !== authorized) {
+    setPrevAuthorized(authorized);
+
+    if (!authorized) {
+      setIsCreating(false);
+      setNewTitle("");
+      setEditingId(null);
+      setEditTitle("");
+      setDeleteTarget(null);
+    }
+  }
+
+  // 변경 요청 상태는 외부 스토어이므로 렌더가 끝난 뒤 초기화
   useEffect(() => {
     if (authorized) return;
 
-    setIsCreating(false);
-    setNewTitle("");
-    setEditingId(null);
-    setEditTitle("");
-    setDeleteTarget(null);
     resetCreate();
     resetUpdate();
     resetDelete();

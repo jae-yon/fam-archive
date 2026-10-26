@@ -2,7 +2,6 @@
 
 import {
   useCallback,
-  useEffect,
   useState,
   type ChangeEvent,
   type KeyboardEvent,
@@ -147,12 +146,17 @@ export function DatePickerInput({ value, onChange, className }: DatePickerInputP
     return next
   }, [])
 
-  useEffect(() => {
+  // value prop이 바뀌면 내부 상태를 다시 맞춘다
+  const [prevValue, setPrevValue] = useState(value)
+
+  if (prevValue !== value) {
+    setPrevValue(value)
+
     const next = toLocalCalendarDate(value)
     setDate(next)
     setMonth(next ?? new Date())
     setInputValue(formatDate(next))
-  }, [value])
+  }
 
   return (
     <Field className={cn("w-1/3", className ?? "")}>

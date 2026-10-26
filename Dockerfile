@@ -18,7 +18,7 @@ COPY package.json package-lock.json ./
 RUN npm ci \
   && npm install --no-save \
     lightningcss-linux-x64-gnu@1.32.0 \
-    @tailwindcss/oxide-linux-x64-gnu@4.3.2
+    @tailwindcss/oxide-linux-x64-gnu@4.3.3
 
 # 프로젝트 코드 복사
 COPY . .
@@ -62,7 +62,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/app/generated ./app/generated
 # Prisma migrate deploy용 스키마·마이그레이션·CLI
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-RUN npm install prisma@7.8.0 dotenv@17.4.2 --omit=dev --no-save \
+RUN npm install prisma@7.10.1 dotenv@17.4.2 --omit=dev --no-save \
   && npm cache clean --force \
   && chown -R nextjs:nodejs /app/node_modules
 
