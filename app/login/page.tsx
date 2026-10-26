@@ -18,48 +18,24 @@ import {
 
 import { appConfig } from "@/config/app";
 
-import { getAccessToken } from "@/lib/storage";
-
 import { useLogin, useGetUser } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [checkingSession, setCheckingSession] = useState(true);
 
   const { mutateAsync: login, isPending, error, reset } = useLogin();
 
+  // 세션 확인 (토큰이 없으면 조회 결과가 null)
+  const { data: user, isPending: isCheckingSession } = useGetUser();
+
+  // 이미 로그인된 상태라면 메인으로 이동
   useEffect(() => {
-    let cancelled = false;
+    if (!user) return;
 
-    async function checkSession() {
-      
-      const token = getAccessToken();
-      
-      if (!token) {
-        if (!cancelled) setCheckingSession(false);
-        return;
-      }
-
-      const user = useGetUser();
-
-      if (cancelled) return;
-
-      if (user) {
-        router.replace("/");
-        return;
-      }
-
-      setCheckingSession(false);
-    }
-
-    void checkSession();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router]);
+    router.replace("/");
+  }, [user, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,7 +44,8 @@ export default function LoginPage() {
     await login({ email, password });
   }
 
-  if (checkingSession) {
+  // 세션 확인 중이거나 메인으로 이동하는 중에는 로그인 폼을 노출하지 않는다
+  if (isCheckingSession || user) {
     return (
       <Container className="flex flex-1 items-center justify-center py-10">
         <p className="text-sm text-muted-foreground">확인 중...</p>
