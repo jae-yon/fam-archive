@@ -160,6 +160,7 @@ npm run dev
 | `npm run build`           | 프로덕션 빌드             |
 | `npm run start`           | 프로덕션 서버 (port 2000) |
 | `npm run lint`            | ESLint              |
+| `npm run typecheck`       | 라우트 타입 생성 + 타입체크      |
 | `npm run prisma:generate` | Prisma Client 생성    |
 | `npm run prisma:migrate`  | 마이그레이션 적용           |
 | `npm run prisma:push`     | 스키마를 DB에 반영 (개발용)   |
@@ -220,7 +221,7 @@ fam-archive/
 
 ## CI / CD
 
-- **CI** — push 시 Docker 이미지 빌드 검증
+- **CI** — push 시 린트·타입체크 후 Docker 이미지 빌드 검증
 - **CD** — `main` 브랜치 CI 성공 후 GHCR 이미지 배포 (GitHub Actions)
 
 배포에 필요한 시크릿·호스트 정보는 Actions Secrets로만 관리하며, 이 문서에는 포함하지 않습니다.
